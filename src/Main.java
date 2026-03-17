@@ -51,7 +51,7 @@ void prompt(){
     String rejoinerPositionAsString = "";
 
     do {
-        System.out.println("Enter rejoiner position (e.g l, m, d):");
+        System.out.println("Enter rejoiner position (e.g l, m, r):");
         rejoinerPosition = scanner.next().toLowerCase().charAt(0);
         rejoinerPositionAsString = String.valueOf(rejoinerPosition);
 
@@ -63,14 +63,16 @@ void prompt(){
     String distributorPositionAsString = "";
 
     do {
-        System.out.println("Enter distributor position (e.g l, m, d):");
+        System.out.println("Enter distributor position (e.g l, m, r):");
         distributorPosition = scanner.next().toLowerCase().charAt(0);
         distributorPositionAsString = String.valueOf(distributorPosition);
 
         if (!containsOnlyValidChars(distributorPositionAsString, VALID_POSITIONS))
             System.out.println("You didn't specify a valid position");
 
-    } while (!containsOnlyValidChars(distributorPositionAsString, VALID_POSITIONS));
+        if (distributorPosition == rejoinerPosition)
+            System.out.println("The distributor cannot be on the same position as the rejoiner");
+    } while (!containsOnlyValidChars(distributorPositionAsString, VALID_POSITIONS) || (distributorPosition == rejoinerPosition));
 
     for (char pos : VALID_POSITIONS.toCharArray()){
         if (pos != distributorPosition && pos != rejoinerPosition){
@@ -158,14 +160,13 @@ void handleAllSingles(){
 
     boolean distributorHasTheirKey = sb.charAt(0) == shapes.charAt(simplifiedPositionDictionary.get(distributorPosition));
 
-    // handle if distributor has their key, if they do, the dissector must send both shapes to the rejoiner
-    if (distributorHasTheirKey){
-        System.out.println("Dissector sends both shapes to " + formattedPositionDictionary.get(rejoinerPosition));
-        return;
-    }
+    char sendToPosition = distributorHasTheirKey ? rejoinerPosition : distributorPosition;
 
-    // if distributor doesn't have their key, it means that the dissector has their key
-    System.out.println("Dissector sends both shapes to " + formattedPositionDictionary.get(distributorPosition));
+    if (!distributorHasTheirKey)
+        System.out.println("Distributor sends both shapes to " + formattedPositionDictionary.get(dissectorPosition));
+
+    System.out.println("Dissector sends both shapes to " + formattedPositionDictionary.get(sendToPosition));
+
 }
 
 void handleAllDoubles(){
